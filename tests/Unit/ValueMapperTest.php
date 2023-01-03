@@ -39,7 +39,7 @@ class ValueMapperTest extends TestCase
     {
         $this->expectException('\InvalidArgumentException');
 
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $mapper->toParameter(new \stdClass());
     }
 
@@ -49,7 +49,7 @@ class ValueMapperTest extends TestCase
 
         $f = fopen('php://temp', 'r');
         fclose($f);
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $mapper->toParameter($f);
     }
 
@@ -57,13 +57,13 @@ class ValueMapperTest extends TestCase
     {
         $this->expectException('\InvalidArgumentException');
 
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $mapper->fromBigQuery(['v' => 'hi'], ['type' => 'BLAH']);
     }
 
     public function testReturnsInt64Object()
     {
-        $mapper = new ValueMapper(true);
+        $mapper = new ValueMapper(true, false);
         $actual = $mapper->fromBigQuery(['v' => '123'], ['type' => 'INTEGER']);
 
         $this->assertInstanceOf(Int64::class, $actual);
@@ -73,7 +73,7 @@ class ValueMapperTest extends TestCase
     public function testParameterFromInt64Object()
     {
         $value = '123';
-        $mapper = new ValueMapper(true);
+        $mapper = new ValueMapper(true, false);
         $int = new Int64($value);
         $actual = $mapper->toParameter($int);
 
@@ -92,7 +92,7 @@ class ValueMapperTest extends TestCase
      */
     public function testMapsFromBigQuery($value, $schema, $expected)
     {
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $actual = $mapper->fromBigQuery($value, $schema);
 
         $this->assertEquals($expected, $actual);
@@ -220,7 +220,7 @@ class ValueMapperTest extends TestCase
 
     public function testMapsBytesFromBigQuery()
     {
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $actual = $mapper->fromBigQuery(
             ['v' => base64_encode('abcd')],
             ['type' => 'BYTES']
@@ -234,7 +234,7 @@ class ValueMapperTest extends TestCase
      */
     public function testMapsToBigQuery($value, $expected)
     {
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $actual = $mapper->toBigQuery($value);
 
         $this->assertEquals($expected, $actual);
@@ -270,7 +270,7 @@ class ValueMapperTest extends TestCase
         if (is_resource($value)) {
             rewind($value);
         }
-        $mapper = new ValueMapper(false);
+        $mapper = new ValueMapper(false, false);
         $actual = $mapper->toParameter($value);
 
         $this->assertEquals($expected, $actual);
